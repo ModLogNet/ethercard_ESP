@@ -9,8 +9,9 @@ License: GPL2
 
 The documentation for this library is at http://jeelabs.net/pub/docs/ethercard/.
 
-##ESP_8266 port by Guilherme Poletto, based on the work by Seradisis for the STM32 platform
-#Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Serasidis_EtherCard_STM
+ESP_8266 port by Guilherme Poletto
+Based on the work by Seradisis for the STM32 platform
+Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Serasidis_EtherCard_STM
 
 ## Library Installation
 
