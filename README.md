@@ -9,8 +9,8 @@ License: GPL2
 
 The documentation for this library is at http://jeelabs.net/pub/docs/ethercard/.
 
-ESP_8266 port by Guilherme Poletto
-Based on the work by Seradisis for the STM32 platform
+ESP_8266 port by Guilherme Poletto.
+Based on the work by Seradisis for the STM32 platform.
 Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Serasidis_EtherCard_STM
 
 ## Library Installation
@@ -50,10 +50,10 @@ See the comments in the example sketches for details about how to try them out.
 	SCK -	GPIO14 == HSPI_CLK	== NodeMcu_D5
 	SO	-	GPIO12 == HSPI_MISO == NodeMcu_D6
 	SI	-	GPIO13 == HSPI_MOSI == NodeMcu_D7
-	CS	-	GPIO15 == HSPI_CS/SS== NodeMcu_D8 !!ATTENTION!!
-			//!!MUST BE LOW FOR THE ESP TO BOOTUP (if high, triggers spi_flash_boot)!!
+	CS	-	GPIO15 == HSPI_CS/SS== NodeMcu_D8 !!ATTENTION
+			//!!MUST BE LOW FOR THE ESP TO BOOTUP (if high, triggers spi_flash_boot!!)
 			//Some ENC28j60 boards have a 10k pullup that MUST be removed
-			//as not to interfere with the ESP bootup process.
+			//as not to interfere with the ESP bootup process
 
 ## Support
 
