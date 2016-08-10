@@ -9,6 +9,9 @@ License: GPL2
 
 The documentation for this library is at http://jeelabs.net/pub/docs/ethercard/.
 
+##ESP_8266 port by Guilherme Poletto, based on the work by Seradisis for the STM32 platform
+#Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Serasidis_EtherCard_STM
+
 ## Library Installation
 
 1. Download the ZIP file from https://github.com/jcw/ethercard/archive/master.zip
@@ -38,6 +41,18 @@ See the comments in the example sketches for details about how to try them out.
     CS  - Pin 53 # Selectable with the ether.begin() function
     # The default CS pin defaults to 8, so you have to set it on a mega:
     ether.begin(sizeof Ethernet::buffer, mymac, 53)
+	
+### PIN Connections (using ESP8266 with Arduino IDE):
+	
+	VCC -	3.3V
+	GND -	 GND
+	SCK -	GPIO14 == HSPI_CLK	== NodeMcu_D5
+	SO	-	GPIO12 == HSPI_MISO == NodeMcu_D6
+	SI	-	GPIO13 == HSPI_MOSI == NodeMcu_D7
+	CS	-	GPIO15 == HSPI_CS/SS== NodeMcu_D8 !!ATTENTION!!
+			//!!MUST BE LOW FOR THE ESP TO BOOTUP (if high, triggers spi_flash_boot)!!
+			//Some ENC28j60 boards have a 10k pullup that MUST be removed
+			//as not to interfere with the ESP bootup process.
 
 ## Support
 
