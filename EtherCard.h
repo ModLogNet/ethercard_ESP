@@ -36,7 +36,10 @@
 #define WRITE_RETURN
 #endif
 
+#ifdef __AVR__
 #include <avr/pgmspace.h>
+#endif
+
 #include "enc28j60.h"
 #include "net.h"
 
@@ -292,8 +295,13 @@ public:
     *     @param  csPin Arduino pin number connected to chip select. Default = 8
     *     @return <i>uint8_t</i> Firmware version or zero on failure.
     */
-    static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
+#ifdef __AVR__
+   static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
                           uint8_t csPin =8);
+#else
+	static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
+                          uint8_t csPin =15);
+#endif
 
     /**   @brief  Configure network interface with static IP
     *     @param  my_ip IP address (4 bytes). 0 for no change.

@@ -56,8 +56,13 @@ public:
     *     @param  csPin Arduino pin used for chip select (enable network interface SPI bus). Default = 8
     *     @return <i>uint8_t</i> ENC28J60 firmware version or zero on failure.
     */
+#ifdef __AVR__
     static uint8_t initialize (const uint16_t size, const uint8_t* macaddr,
                                uint8_t csPin = 8);
+#else
+	static uint8_t initialize (const uint16_t size, const uint8_t* macaddr,
+                               uint8_t csPin = 15);
+#endif
 
     /**   @brief  Check if network link is connected
     *     @return <i>bool</i> True if link is up
@@ -144,7 +149,11 @@ public:
     *     @param  csPin Arduino pin used for chip select (enable SPI bus)
     *     @return <i>uint8_t</i> 0 on failure
     */
+#ifdef __AVR__
     static uint8_t doBIST(uint8_t csPin = 8);
+#else
+	static uint8_t doBIST(uint8_t csPin = 15);
+#endif
 
     /**   @brief  Copies a slice from the current packet to RAM
     *     @param  dest pointer in RAM where the data is copied to

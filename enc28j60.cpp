@@ -15,6 +15,12 @@
 #endif
 #include "enc28j60.h"
 
+#ifdef __AVR__
+#else
+#include <SPI.h>
+#endif
+
+
 uint16_t ENC28J60::bufferSize;
 bool ENC28J60::broadcast_enabled = false;
 bool ENC28J60::promiscuous_enabled = false;
@@ -239,6 +245,7 @@ bool ENC28J60::promiscuous_enabled = false;
 static byte Enc28j60Bank;
 static byte selectPin;
 
+#ifdef __AVR__
 void ENC28J60::initSPI () {
     pinMode(SS, OUTPUT);
     digitalWrite(SS, HIGH);
@@ -253,17 +260,28 @@ void ENC28J60::initSPI () {
     SPCR = bit(SPE) | bit(MSTR); // 8 MHz @ 16
     bitSet(SPSR, SPI2X);
 }
+#else
+void ENC28J60::initSPI () {
+	SPI.begin();
+	SPI.setBitOrder(MSBFIRST);
+}
+#endif
 
 static void enableChip () {
+#ifdef __AVR__
     cli();
+#endif
     digitalWrite(selectPin, LOW);
 }
 
 static void disableChip () {
     digitalWrite(selectPin, HIGH);
+#ifdef __AVR__
     sei();
+#endif
 }
 
+#ifdef __AVR__
 static void xferSPI (byte data) {
     SPDR = data;
     while (!(SPSR&(1<<SPIF)))
@@ -328,6 +346,91 @@ static void writeBuf(uint16_t len, const byte* data) {
     disableChip();
 }
 
+#else
+
+//static byte readOp (byte op, byte address) {
+//  enableChip();
+//	byte result;
+//	SPI.transfer(op | (address & ADDR_MASK));
+//	result = SPI.transfer(0x00);
+//	if (address & 0x80)
+//		result = SPI.transfer(0x00);
+//	
+//    disableChip();
+//    return result;
+//}
+static byte readOp (byte op, byte address) {
+    enableChip();
+	byte result;
+	SPI.transfer(op | (address & ADDR_MASK));
+	result = SPI.transfer(0x00);
+	if (address & 0x80)
+		result = SPI.transfer(0x00);
+	
+    disableChip();
+    return result;
+}
+
+//static void writeOp (byte op, byte address, byte data) {
+//    enableChip();
+//    SPI.transfer(op | (address & ADDR_MASK));
+//    SPI.transfer(data);
+//    disableChip();
+//}
+static void writeOp (byte op, byte address, byte data) {
+    enableChip();
+	SPI.transfer(op | (address & ADDR_MASK));
+	SPI.transfer(data);
+    disableChip();
+}
+
+//static void readBuf(uint16_t len, byte* data) {
+//    uint8_t nextbyte;
+//
+//    enableChip();
+//    if (len != 0) {    
+//        SPI.transfer(ENC28J60_READ_BUF_MEM);
+//
+//       while (--len) {
+//            
+//        *data++ = nextbyte;
+//		}
+//    }
+//    disableChip(); 
+//}
+
+static void readBuf(uint16_t len, byte* data) {
+    enableChip();
+	SPI.transfer(ENC28J60_READ_BUF_MEM);
+    while (len--) {
+		*data++ = SPI.transfer(0x00);
+    }
+    disableChip();
+}
+
+//static void writeBuf(uint16_t len, const byte* data) {
+//    enableChip();
+//    if (len != 0) {
+//        SPI.transfer(ENC28J60_WRITE_BUF_MEM);
+//           
+//        while (--len) {
+//			SPI.transfer(*data++);
+//     	}
+//    }
+//    disableChip();
+//}
+
+static void writeBuf(uint16_t len, const byte* data) {
+    enableChip();
+	SPI.transfer(ENC28J60_WRITE_BUF_MEM);
+
+	while (len--)
+		SPI.transfer(*data++);
+
+    disableChip();
+}
+#endif
+
 static void SetBank (byte address) {
     if ((address & BANK_MASK) != Enc28j60Bank) {
         writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_BSEL1|ECON1_BSEL0);
@@ -373,7 +476,9 @@ static void writePhy (byte address, uint16_t data) {
 
 byte ENC28J60::initialize (uint16_t size, const byte* macaddr, byte csPin) {
     bufferSize = size;
+#ifdef __AVR__
     if (bitRead(SPCR, SPE) == 0)
+#endif
         initSPI();
     selectPin = csPin;
     pinMode(selectPin, OUTPUT);
@@ -659,7 +764,9 @@ uint8_t ENC28J60::doBIST ( byte csPin) {
 #define RANDOM_RACE     0b1100
 
 // init
+#ifdef __AVR__
     if (bitRead(SPCR, SPE) == 0)
+#endif
         initSPI();
     selectPin = csPin;
     pinMode(selectPin, OUTPUT);

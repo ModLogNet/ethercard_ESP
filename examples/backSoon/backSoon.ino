@@ -2,6 +2,7 @@
 // 2011-01-30 <jc@wippler.nl> http://opensource.org/licenses/mit-license.php
  
 #include <EtherCard.h>
+#include <SPI.h>
 
 #define STATIC 0  // set to 1 to disable DHCP (adjust myip/gwip values below)
 
@@ -37,7 +38,7 @@ const char page[] PROGMEM =
 ;
 
 void setup(){
-  Serial.begin(57600);
+  Serial.begin(74880);
   Serial.println("\n[backSoon]");
   
   if (ether.begin(sizeof Ethernet::buffer, mymac) == 0) 
