@@ -15,8 +15,7 @@
 #endif
 #include "enc28j60.h"
 
-#ifdef __AVR__
-#else
+#ifndef __AVR__ // if not an AVR, use SPI.h library for that platform
 #include <SPI.h>
 #endif
 
@@ -268,20 +267,20 @@ void ENC28J60::initSPI () {
 #endif
 
 static void enableChip () {
-#ifdef __AVR__
+//#ifdef __AVR__ // Disable all interrupts while reading the SPI device.
     cli();
-#endif
+//#endif
     digitalWrite(selectPin, LOW);
 }
 
 static void disableChip () {
     digitalWrite(selectPin, HIGH);
-#ifdef __AVR__
+//#ifdef __AVR__ // Re-enables all interrupts after reading from SPI device.
     sei();
-#endif
+//#endif
 }
 
-#ifdef __AVR__
+#ifdef __AVR__ // if i am an AVR, use this custom SPI transfer routine.
 static void xferSPI (byte data) {
     SPDR = data;
     while (!(SPSR&(1<<SPIF)))
@@ -346,19 +345,8 @@ static void writeBuf(uint16_t len, const byte* data) {
     disableChip();
 }
 
-#else
+#else // Else, use SPI.transfer from SPI library.
 
-//static byte readOp (byte op, byte address) {
-//  enableChip();
-//	byte result;
-//	SPI.transfer(op | (address & ADDR_MASK));
-//	result = SPI.transfer(0x00);
-//	if (address & 0x80)
-//		result = SPI.transfer(0x00);
-//	
-//    disableChip();
-//    return result;
-//}
 static byte readOp (byte op, byte address) {
     enableChip();
 	byte result;
@@ -371,12 +359,6 @@ static byte readOp (byte op, byte address) {
     return result;
 }
 
-//static void writeOp (byte op, byte address, byte data) {
-//    enableChip();
-//    SPI.transfer(op | (address & ADDR_MASK));
-//    SPI.transfer(data);
-//    disableChip();
-//}
 static void writeOp (byte op, byte address, byte data) {
     enableChip();
 	SPI.transfer(op | (address & ADDR_MASK));
@@ -384,7 +366,7 @@ static void writeOp (byte op, byte address, byte data) {
     disableChip();
 }
 
-//static void readBuf(uint16_t len, byte* data) {
+//static void readBuf(uint16_t len, byte* data) { //this bit trying to re-write from the latest code
 //    uint8_t nextbyte;
 //
 //    enableChip();
@@ -399,7 +381,7 @@ static void writeOp (byte op, byte address, byte data) {
 //    disableChip(); 
 //}
 
-static void readBuf(uint16_t len, byte* data) {
+static void readBuf(uint16_t len, byte* data) { //this bit ipsis literis from Seradisis's port
     enableChip();
 	SPI.transfer(ENC28J60_READ_BUF_MEM);
     while (len--) {
@@ -408,7 +390,7 @@ static void readBuf(uint16_t len, byte* data) {
     disableChip();
 }
 
-//static void writeBuf(uint16_t len, const byte* data) {
+//static void writeBuf(uint16_t len, const byte* data) { //this bit trying to re-write from the latest code
 //    enableChip();
 //    if (len != 0) {
 //        SPI.transfer(ENC28J60_WRITE_BUF_MEM);
@@ -420,7 +402,7 @@ static void readBuf(uint16_t len, byte* data) {
 //    disableChip();
 //}
 
-static void writeBuf(uint16_t len, const byte* data) {
+static void writeBuf(uint16_t len, const byte* data) { //this bit ipsis literis from Seradisis's port
     enableChip();
 	SPI.transfer(ENC28J60_WRITE_BUF_MEM);
 
@@ -476,7 +458,7 @@ static void writePhy (byte address, uint16_t data) {
 
 byte ENC28J60::initialize (uint16_t size, const byte* macaddr, byte csPin) {
     bufferSize = size;
-#ifdef __AVR__
+#ifdef __AVR__ // if i am an AVR, do this part of the AVR-specific SPI routine.
     if (bitRead(SPCR, SPE) == 0)
 #endif
         initSPI();
@@ -764,7 +746,7 @@ uint8_t ENC28J60::doBIST ( byte csPin) {
 #define RANDOM_RACE     0b1100
 
 // init
-#ifdef __AVR__
+#ifdef __AVR__ // if i am an AVR, do this part of the AVR-specific SPI routine.
     if (bitRead(SPCR, SPE) == 0)
 #endif
         initSPI();

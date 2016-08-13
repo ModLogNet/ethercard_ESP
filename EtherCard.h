@@ -36,7 +36,7 @@
 #define WRITE_RETURN
 #endif
 
-#ifdef __AVR__
+#ifdef __AVR__  // Whatever this is, causes STM32F1__ and ESP8266 not to compile.
 #include <avr/pgmspace.h>
 #endif
 
@@ -295,14 +295,18 @@ public:
     *     @param  csPin Arduino pin number connected to chip select. Default = 8
     *     @return <i>uint8_t</i> Firmware version or zero on failure.
     */
-#ifdef __AVR__
+#if defined(__AVR__)
    static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
                           uint8_t csPin =8);
-#else
+#endif
+#if defined(ESP8266)
 	static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
                           uint8_t csPin =15);
 #endif
-
+#if defined(__STM32F1__)
+	static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
+                          uint8_t csPin =PA8);
+#endif
     /**   @brief  Configure network interface with static IP
     *     @param  my_ip IP address (4 bytes). 0 for no change.
     *     @param  gw_ip Gateway address (4 bytes). 0 for no change. Default = 0

@@ -12,7 +12,7 @@
 #include <EtherCard.h>
 #include <stdarg.h>
 
-#ifdef __AVR__
+#ifdef __AVR__ // only uses EEPROM if my platform is an AVR with EEPROM built in.
 #include <avr/eeprom.h>
 #endif
 
@@ -195,7 +195,7 @@ void Stash::prepare (PGM_P fmt, ...) {
             case 'E': {
                 byte* s = (byte*) argval;
                 char d;
-#ifdef __AVR__				
+#ifdef __AVR__				//something about an EEPROM that only exists in the AVR based boards
                 while ((d = eeprom_read_byte(s++)) != 0)
                     ++arglen;
 #endif
@@ -275,7 +275,7 @@ void Stash::extract (uint16_t offset, uint16_t count, void* buf) {
         case 'F':
             c = pgm_read_byte(ptr++);
             break;
-#ifdef __AVR__			
+#ifdef __AVR__			//Something else about that EEPROM only available in the AVR's
         case 'E':
             c = eeprom_read_byte((byte*) ptr++);
             break;
@@ -380,7 +380,7 @@ void BufferFiller::emit_p(PGM_P fmt, ...) {
         case 'E': {
             byte* s = va_arg(ap, byte*);
             char d;
-#ifdef __AVR__
+#ifdef __AVR__		//This EEPROM of them AVR's that keeps comming up.
             while ((d = eeprom_read_byte(s++)) != 0)
                 *ptr++ = d;
             continue;
