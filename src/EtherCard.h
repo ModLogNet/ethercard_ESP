@@ -303,6 +303,10 @@ public:
 	static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
                           uint8_t csPin =15);
 #endif
+#if defined(ESP32)
+	static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
+                          uint8_t csPin =5);
+#endif
 #if defined(__STM32F1__)
 	static uint8_t begin (const uint16_t size, const uint8_t* macaddr,
                           uint8_t csPin =PA8);

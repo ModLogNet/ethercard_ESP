@@ -1,11 +1,9 @@
 # EtherCard
 
-[![Travis Status][S]][T]
-
 **EtherCard** is a driver for the ENC28J60 chip, compatible with Arduino IDE.
 Adapted and extended from code written by Guido Socher and Pascal Stang.
 
-License: GPL2
+License: GPLv2
 
 The documentation for this library is at http://jeelabs.net/pub/docs/ethercard/.
 
