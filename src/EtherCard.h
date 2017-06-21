@@ -26,15 +26,9 @@
   #define __PROG_TYPES_COMPAT__
 #endif
 
-#if ARDUINO >= 100
 #include <Arduino.h> // Arduino 1.0
 #define WRITE_RESULT size_t
 #define WRITE_RETURN return 1;
-#else
-#include <WProgram.h> // Arduino 0022
-#define WRITE_RESULT void
-#define WRITE_RETURN
-#endif
 
 #ifdef __AVR__  // Whatever this is, causes STM32F1__ and ESP8266 not to compile.
 #include <avr/pgmspace.h>
