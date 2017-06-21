@@ -15,22 +15,16 @@ void EtherCard::copyMac (uint8_t *dst, const uint8_t *src) {
 }
 
 void EtherCard::printIp (const char* msg, const uint8_t *buf) {
-    Serial.print(msg);
+    DEBUG_PRINT(msg);
     EtherCard::printIp(buf);
-    Serial.println();
-}
-
-void EtherCard::printIp (const __FlashStringHelper *ifsh, const uint8_t *buf) {
-    Serial.print(ifsh);
-    EtherCard::printIp(buf);
-    Serial.println();
 }
 
 void EtherCard::printIp (const uint8_t *buf) {
     for (uint8_t i = 0; i < 4; ++i) {
-        Serial.print( buf[i], DEC );
-        if (i < 3)
-            Serial.print('.');
+        DEBUG_PRINT( buf[i] );
+        if (i < 3) {
+            DEBUG_PRINT('.');
+		}
     }
 }
 
@@ -186,7 +180,7 @@ void EtherCard::makeNetStr (char *resultstr,uint8_t *bytestr,uint8_t len,char se
     uint8_t i=0;
     uint8_t j=0;
     while(i<len) {
-        itoa((int)bytestr[i],&resultstr[j],base);
+        ltoa((long)bytestr[i],&resultstr[j],base);
         // search end of str:
         while(resultstr[j]) {
             j++;

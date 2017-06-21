@@ -598,9 +598,9 @@ static uint16_t tcp_datafill_cb(uint8_t fd) {
     Stash::cleanup();
     EtherCard::tcpOffset()[len] = 0;
 #if SERIAL
-    Serial.print("REQUEST: ");
-    Serial.println(len);
-    Serial.println((char*) EtherCard::tcpOffset());
+    DEBUG_PRINT("REQUEST: ");
+    DEBUG_PRINT(len);
+    DEBUG_PRINT((char*) EtherCard::tcpOffset());
 #endif
     result_fd = 123; // bogus value
     return len;
@@ -638,7 +638,7 @@ uint8_t EtherCard::packetLoopIcmpCheckReply (const uint8_t *ip_monitoredhost) {
            check_ip_message_is_from(ip_monitoredhost);
 }
 
-uint16_t EtherCard::accept(const uint16_t port, uint16_t plen) {
+uint16_t EtherCard::acceptp(const uint16_t port, uint16_t plen) {
     uint16_t pos;
 
     if (gPB[TCP_DST_PORT_H_P] == (port >> 8) &&
@@ -825,7 +825,7 @@ uint16_t EtherCard::packetLoop (uint16_t plen) {
 
 #if ETHERCARD_TCPSERVER
     //If we are here then this is a TCP/IP packet targetted at us and not related to our client connection so accept
-    return accept(hisport, plen);
+    return acceptp(hisport, plen);
 #endif
 }
 

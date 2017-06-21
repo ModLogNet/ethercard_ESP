@@ -263,17 +263,11 @@ void ENC28J60::initSPI () {
 #endif
 
 static void enableChip () {
-//#ifdef __AVR__ // Disable all interrupts while reading the SPI device.
-    cli();
-//#endif
     digitalWrite(selectPin, LOW);
 }
 
 static void disableChip () {
     digitalWrite(selectPin, HIGH);
-//#ifdef __AVR__ // Re-enables all interrupts after reading from SPI device.
-    sei();
-//#endif
 }
 
 #ifdef __AVR__ // if i am an AVR, use this custom SPI transfer routine.
@@ -545,9 +539,9 @@ struct transmit_status_vector {
 void ENC28J60::packetSend(uint16_t len) {
     byte retry = 0;
 
-    #if ETHERCARD_SEND_PIPELINING
-        goto resume_last_transmission;
-    #endif
+    // #if ETHERCARD_SEND_PIPELINING
+        // goto resume_last_transmission;
+    // #endif
     while (1) {
         // latest errata sheet: DS80349C 
         // always reset transmit logic (Errata Issue 12)
@@ -574,7 +568,7 @@ void ENC28J60::packetSend(uint16_t len) {
             if (retry == 0) return;
         #endif
 
-    resume_last_transmission:
+    // resume_last_transmission:
 
         // wait until transmission has finished; referrring to the data sheet and 
         // to the errata (Errata Issue 13; Example 1) you only need to wait until either 

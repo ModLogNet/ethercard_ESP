@@ -355,21 +355,21 @@ void EtherCard::DhcpStateMachine (uint16_t len)
 
 #ifdef DHCPDEBUG
     if (dhcpState != DHCP_STATE_BOUND) {
-        Serial.print(millis());
-        Serial.print(" State: ");
+        DEBUG_PRINT(millis());
+        DEBUG_PRINT(" State: ");
     }
     switch (dhcpState) {
     case DHCP_STATE_INIT:
-        Serial.println("Init");
+        DEBUG_PRINT("Init");
         break;
     case DHCP_STATE_SELECTING:
-        Serial.println("Selecting");
+        DEBUG_PRINT("Selecting");
         break;
     case DHCP_STATE_REQUESTING:
-        Serial.println("Requesting");
+        DEBUG_PRINT("Requesting");
         break;
     case DHCP_STATE_RENEWING:
-        Serial.println("Renew");
+        DEBUG_PRINT("Renew");
         break;
     }
 #endif

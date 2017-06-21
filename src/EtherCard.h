@@ -30,9 +30,13 @@
 #define WRITE_RESULT size_t
 #define WRITE_RETURN return 1;
 
-#ifdef __AVR__  // Whatever this is, causes STM32F1__ and ESP8266 not to compile.
-#include <avr/pgmspace.h>
+#ifndef DEBUG
+	#define DEBUG_PRINT(x)
 #endif
+
+#include <pgmspace.h>
+#include <Print.h>
+
 
 #include "enc28j60.h"
 #include "net.h"
@@ -80,6 +84,8 @@
 */
 #define ETHERCARD_STASH 1
 
+void reverse(char* begin, char* end);
+char* ltoa (long val, char *s, int radix);
 
 /** This type definition defines the structure of a UDP server event handler callback funtion */
 typedef void (*UdpServerCallback)(
@@ -104,7 +110,7 @@ typedef struct {
 } StashHeader;
 
 /** This class provides access to the memory within the ENC28J60 network interface. */
-class Stash : public /*Stream*/ Print, private StashHeader {
+class Stash : public Print, private StashHeader {
     uint8_t curr;      //!< Current page
     uint8_t offs;      //!< Current offset in page
 
@@ -217,6 +223,7 @@ public:
 *   ~~~~~~~~~~~~~
 *
 */
+
 class BufferFiller : public Print {
     uint8_t *start; //!< Pointer to start of buffer
     uint8_t *ptr; //!< Pointer to cursor position
@@ -338,7 +345,7 @@ public:
     *     @param  plen Number of bytes in packet
     *     @return <i>uint16_t</i> Offset within packet of TCP payload. Zero for no data.
     */
-    static uint16_t accept (uint16_t port, uint16_t plen);
+    static uint16_t acceptp (uint16_t port, uint16_t plen);
 
     /**   @brief  Send a response to a HTTP request
     *     @param  dlen Size of the HTTP (TCP) payload
@@ -588,14 +595,6 @@ public:
     *     @note   There is no check of source or destination size. Ensure both are 4 bytes
     */
     static void printIp (const char* msg, const uint8_t *buf);
-
-    /**   @brief  Output Flash String Helper and IP address to serial port in dotted decimal IP format
-    *     @param  ifsh Pointer to Flash String Helper
-    *     @param  buf Pointer to 4 byte IP address
-    *     @note   There is no check of source or destination size. Ensure both are 4 bytes
-    *     @todo   What is a FlashStringHelper?
-    */
-    static void printIp (const __FlashStringHelper *ifsh, const uint8_t *buf);
 
     /**   @brief  Search for a string of the form key=value in a string that looks like q?xyz=abc&uvw=defgh HTTP/1.1\\r\\n
     *     @param  str Pointer to the null terminated string to search
