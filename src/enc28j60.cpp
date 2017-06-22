@@ -11,9 +11,11 @@
 #include <Arduino.h> // Arduino 1.0
 #include "enc28j60.h"
 
-#ifndef __AVR__ // if not an AVR, use SPI.h library for that platform
+#include "fw/src/mgos_app.h"
+#include "fw/src/mgos_mongoose.h"
+#include "fw/src/mgos_sys_config.h"
+
 #include <SPI.h>
-#endif
 
 
 uint16_t ENC28J60::bufferSize;
@@ -258,7 +260,7 @@ void ENC28J60::initSPI () {
 #else
 void ENC28J60::initSPI () {
 	SPI.begin();
-	SPI.setBitOrder(MSBFIRST);
+	SPI.setBitOrder(SPI_MSBFIRST);
 }
 #endif
 
@@ -344,7 +346,6 @@ static byte readOp (byte op, byte address) {
 	result = SPI.transfer(0x00);
 	if (address & 0x80)
 		result = SPI.transfer(0x00);
-	
     disableChip();
     return result;
 }
@@ -448,19 +449,15 @@ static void writePhy (byte address, uint16_t data) {
 
 byte ENC28J60::initialize (uint16_t size, const byte* macaddr, byte csPin) {
     bufferSize = size;
-#ifdef __AVR__ // if i am an AVR, do this part of the AVR-specific SPI routine.
-    if (bitRead(SPCR, SPE) == 0)
-#endif
-        initSPI();
+    initSPI();
     selectPin = csPin;
     pinMode(selectPin, OUTPUT);
     disableChip();
-
     writeOp(ENC28J60_SOFT_RESET, 0, ENC28J60_SOFT_RESET);
     delay(2); // errata B7/2
     while (!readOp(ENC28J60_READ_CTRL_REG, ESTAT) & ESTAT_CLKRDY)
         ;
-
+	LOG(LL_INFO, ("after while"));
     writeReg(ERXST, RXSTART_INIT);
     writeReg(ERXRDPT, RXSTART_INIT);
     writeReg(ERXND, RXSTOP_INIT);
@@ -488,7 +485,9 @@ byte ENC28J60::initialize (uint16_t size, const byte* macaddr, byte csPin) {
     writeOp(ENC28J60_BIT_FIELD_SET, EIE, EIE_INTIE|EIE_PKTIE);
     writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_RXEN);
 
+	LOG(LL_INFO, ("before read reg byte"));
     byte rev = readRegByte(EREVID);
+	LOG(LL_INFO, ("rev %d ", rev));
     // microchip forgot to step the number on the silcon when they
     // released the revision B7. 6 is now rev B7. We still have
     // to see what they do when they release B8. At the moment

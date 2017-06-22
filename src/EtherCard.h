@@ -84,9 +84,6 @@
 */
 #define ETHERCARD_STASH 1
 
-void reverse(char* begin, char* end);
-char* ltoa (long val, char *s, int radix);
-
 /** This type definition defines the structure of a UDP server event handler callback funtion */
 typedef void (*UdpServerCallback)(
     uint16_t dest_port,    ///< Port the packet was sent to

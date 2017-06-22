@@ -6,6 +6,10 @@
 
 #include "EtherCard.h"
 
+#include "fw/src/mgos_app.h"
+#include "fw/src/mgos_mongoose.h"
+#include "fw/src/mgos_sys_config.h"
+
 void EtherCard::copyIp (uint8_t *dst, const uint8_t *src) {
     memcpy(dst, src, 4);
 }
@@ -15,13 +19,13 @@ void EtherCard::copyMac (uint8_t *dst, const uint8_t *src) {
 }
 
 void EtherCard::printIp (const char* msg, const uint8_t *buf) {
-    DEBUG_PRINT(msg);
+    LOG(LL_INFO, ("%s", msg));
     EtherCard::printIp(buf);
 }
 
 void EtherCard::printIp (const uint8_t *buf) {
     for (uint8_t i = 0; i < 4; ++i) {
-        DEBUG_PRINT( buf[i] );
+        LOG(LL_INFO, ( "%d", buf[i]) );
         if (i < 3) {
             DEBUG_PRINT('.');
 		}
