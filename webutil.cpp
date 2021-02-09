@@ -6,9 +6,9 @@
 
 #include "EtherCard.h"
 
-#include "fw/src/mgos_app.h"
-#include "fw/src/mgos_mongoose.h"
-#include "fw/src/mgos_sys_config.h"
+//#include "fw/src/mgos_app.h"
+//#include "fw/src/mgos_mongoose.h"
+//#include "fw/src/mgos_sys_config.h"
 
 void EtherCard::copyIp (uint8_t *dst, const uint8_t *src) {
     memcpy(dst, src, 4);
@@ -19,17 +19,19 @@ void EtherCard::copyMac (uint8_t *dst, const uint8_t *src) {
 }
 
 void EtherCard::printIp (const char* msg, const uint8_t *buf) {
-    LOG(LL_INFO, ("%s", msg));
-    EtherCard::printIp(buf);
+   Serial.print(msg);
+   EtherCard::printIp(buf);
 }
 
 void EtherCard::printIp (const uint8_t *buf) {
+	String info;
     for (uint8_t i = 0; i < 4; ++i) {
-        LOG(LL_INFO, ( "%d", buf[i]) );
+       info = info + buf[i] ;
         if (i < 3) {
-            DEBUG_PRINT('.');
+            info = info + ".";
 		}
     }
+	Serial.println (info);
 }
 
 // search for a string of the form key=value in

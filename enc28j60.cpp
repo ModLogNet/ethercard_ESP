@@ -11,9 +11,9 @@
 #include <Arduino.h> // Arduino 1.0
 #include "enc28j60.h"
 
-#include "fw/src/mgos_app.h"
-#include "fw/src/mgos_mongoose.h"
-#include "fw/src/mgos_sys_config.h"
+//#include "fw/src/mgos_app.h"
+//#//include "fw/src/mgos_mongoose.h"
+//#include "fw/src/mgos_sys_config.h"
 
 #include <SPI.h>
 
@@ -457,7 +457,7 @@ byte ENC28J60::initialize (uint16_t size, const byte* macaddr, byte csPin) {
     delay(2); // errata B7/2
     while (!readOp(ENC28J60_READ_CTRL_REG, ESTAT) & ESTAT_CLKRDY)
         ;
-	LOG(LL_INFO, ("after while"));
+	//LOG(LL_INFO, ("after while"));
     writeReg(ERXST, RXSTART_INIT);
     writeReg(ERXRDPT, RXSTART_INIT);
     writeReg(ERXND, RXSTOP_INIT);
@@ -485,9 +485,9 @@ byte ENC28J60::initialize (uint16_t size, const byte* macaddr, byte csPin) {
     writeOp(ENC28J60_BIT_FIELD_SET, EIE, EIE_INTIE|EIE_PKTIE);
     writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_RXEN);
 
-	LOG(LL_INFO, ("before read reg byte"));
+	//LOG(LL_INFO, ("before read reg byte"));
     byte rev = readRegByte(EREVID);
-	LOG(LL_INFO, ("rev %d ", rev));
+	//LOG(LL_INFO, ("rev %d ", rev));
     // microchip forgot to step the number on the silcon when they
     // released the revision B7. 6 is now rev B7. We still have
     // to see what they do when they release B8. At the moment
