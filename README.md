@@ -16,14 +16,13 @@ Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Sera
 
 ### PIN Connections (using ESP32 with Arduino IDE):
 
-  ENC	ESP32
- -----  -----   
-  VCC	3.3V
-  GND	GND
-  SO	MISO [19]
-  SI	MOSI [23]
-  SCK	CLK [18]
-  CS	CSO [5]
+    ENC	ESP32
+    VCC -	3.3V
+    GND -	GND
+    SO -	MISO [19]
+    SI -	MOSI [23]
+    SCK -	CLK [18]
+    CS -	CSO [5]
 
 ### PIN Connections (Using Arduino UNO):
 
