@@ -11,6 +11,7 @@ ESP_8266 port by Guilherme Poletto.
 Based on the work by Seradisis for the STM32 platform.
 Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Serasidis_EtherCard_STM
 
+
 ## Physical Installation
 
 ### PIN Connections (using ESP32 with Arduino IDE):
