@@ -23,6 +23,7 @@ Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Sera
     SI -	MOSI [23]
     SCK -	CLK [18]
     CS -	CSO [5]
+    Credit @ColinDexter
 
 ### PIN Connections (Using Arduino UNO):
 
