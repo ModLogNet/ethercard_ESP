@@ -19,7 +19,18 @@ Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Sera
 
 See the comments in the example sketches for details about how to try them out.
 
+<<<<<<< HEAD
 ## Physical Installation
+=======
+    [ENC]	[ESP32]
+    VCC -	3.3V
+    GND -	GND
+    SO -	MISO [19]
+    SI -	MOSI [23]
+    SCK -	CLK [18]
+    CS -	CSO [5]
+    Credit @ColinDexter
+>>>>>>> 677a49a99dae49fa4d96b6eea54e07ee6b7e0bdf
 
 ### PIN Connections (Using Arduino UNO):
 
