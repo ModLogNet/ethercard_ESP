@@ -12,7 +12,7 @@
 // Copyright: GPL V2
 // See http://www.gnu.org/licenses/gpl.html
 
-//#define DHCPDEBUG
+#define DHCPDEBUG
 
 #include "EtherCard.h"
 #include "net.h"
@@ -30,6 +30,11 @@
 #define DHCP_ACK 5
 #define DHCP_NAK 6
 #define DHCP_RELEASE 7
+
+
+
+
+
 
 // DHCP States for access in applications (ref RFC 2131)
 enum {
@@ -150,7 +155,7 @@ static void addBytes (byte len, const byte* data) {
 // 255 End
 
 static void send_dhcp_message(uint8_t *requestip) {
-
+DEBUG_PRINT("send_dhcp_message");
     memset(gPB, 0, UDP_DATA_P + sizeof( DHCPdata ));
 
     EtherCard::udpPrepare(DHCP_CLIENT_PORT,
@@ -207,11 +212,19 @@ static void send_dhcp_message(uint8_t *requestip) {
     if (dhcpCustomOptionNum)
         len++;
     addToBuf(55);     // Parameter request list
-    addToBuf(len);    // Length
-    addToBuf(1);      // Subnet mask
-    addToBuf(3);      // Route/Gateway
-    addToBuf(6);      // DNS Server
-    if (dhcpCustomOptionNum)
+    addToBuf(254);    // Length
+   // addToBuf(1);      // Subnet mask
+   // addToBuf(3);      // Route/Gateway
+   // addToBuf(6);      // DNS Server
+    
+	//addToBuf(51);
+	//addToBuf(66);
+	//addToBuf(67	);
+
+	for (unsigned int i = 1; i < 254; ++i) {
+    	addToBuf(i);
+	}
+	if (dhcpCustomOptionNum)
         addToBuf(dhcpCustomOptionNum);  // Custom option
     addToBuf(255);    // end option
 
@@ -220,7 +233,8 @@ static void send_dhcp_message(uint8_t *requestip) {
 }
 
 static void process_dhcp_offer(uint16_t len, uint8_t *offeredip) {
-    // Map struct onto payload
+    DEBUG_PRINT("process_dhcp_offer");
+	// Map struct onto payload
     DHCPdata *dhcpPtr = (DHCPdata*) (gPB + UDP_DATA_P);
 
     // Offered IP address is in yiaddr
@@ -240,18 +254,25 @@ static void process_dhcp_offer(uint16_t len, uint8_t *offeredip) {
 }
 
 static void process_dhcp_ack(uint16_t len) {
-    // Map struct onto payload
+    
+	// Map struct onto payload
     DHCPdata *dhcpPtr = (DHCPdata*) (gPB + UDP_DATA_P);
 
     // Allocated IP address is in yiaddr
     EtherCard::copyIp(EtherCard::myip, dhcpPtr->yiaddr);
-
+    int counter=0;
     // Scan through variable length option list identifying options we want
     byte *ptr = (byte*) (dhcpPtr + 1) + 4;
     bool done = false;
     do {
         byte option = *ptr++;
         byte optionLen = *ptr++;
+		
+		int a = 0;
+		char temp [optionLen + 1] ;
+		String temp1;
+		byte i;
+		
         switch (option) {
         case 1:
             EtherCard::copyIp(EtherCard::netmask, ptr);
@@ -262,7 +283,6 @@ static void process_dhcp_ack(uint16_t len) {
         case 6:
             EtherCard::copyIp(EtherCard::dnsip, ptr);
             break;
-        case 51:
         case 58:
             leaseTime = 0; // option 58 = Renewal Time, 51 = Lease Time
             for (byte i = 0; i<4; i++)
@@ -271,22 +291,26 @@ static void process_dhcp_ack(uint16_t len) {
                 leaseTime *= 1000;      // milliseconds
             }
             break;
-        case 255:
+		case 255:
             done = true;
             break;
+			
         default: {
-            // Is is a custom configured option?
-            if (dhcpCustomOptionCallback && option == dhcpCustomOptionNum) {
-                dhcpCustomOptionCallback(option, ptr, optionLen);
-            }
+				
+            // Is is a custom configured option?AsciiField(ptr,option,optionLen);
+          //  if (dhcpCustomOptionCallback && option == dhcpCustomOptionNum) {
+             //   dhcpCustomOptionCallback(option, ptr, optionLen);
+          //  }
         }
         }
+		dhcpCustomOptionCallback(option, ptr, optionLen);
         ptr += optionLen;
     } while (!done && ptr < gPB + len);
 }
 
 static bool dhcp_received_message_type (uint16_t len, byte msgType) {
     // Map struct onto payload
+	DEBUG_PRINT("dhcp_received_message_type");
     DHCPdata *dhcpPtr = (DHCPdata*) (gPB + UDP_DATA_P);
 
     if (len >= 70 && gPB[UDP_SRC_PORT_L_P] == DHCP_SERVER_PORT &&
@@ -313,6 +337,7 @@ static char toAsciiHex(byte b) {
 }
 
 bool EtherCard::dhcpSetup (const char *hname, bool fromRam) {
+	DEBUG_PRINT("EtherCard::dhcpSetup");
     // Use during setup, as this discards all incoming requests until it returns.
     // That shouldn't be a problem, because we don't have an IP-address yet.
     // Will try 60 secs to obtain DHCP-lease.
@@ -335,9 +360,9 @@ bool EtherCard::dhcpSetup (const char *hname, bool fromRam) {
 
     dhcpState = DHCP_STATE_INIT;
     uint16_t start = millis();
-
-    while (dhcpState != DHCP_STATE_BOUND && uint16_t(millis()) - start < 60000) {
-        if (isLinkUp()) DhcpStateMachine(packetReceive());
+delay (10);
+    while (dhcpState != DHCP_STATE_BOUND && uint16_t(millis()) - start < 20000 && ENC28J60::isLinkUp()&& uint16_t(millis()) - start > 0) {
+		if (isLinkUp()) DhcpStateMachine(packetReceive());
     }
     updateBroadcastAddress();
     delaycnt = 0;
@@ -389,7 +414,7 @@ void EtherCard::DhcpStateMachine (uint16_t len)
         currentXid = millis();
         memset(myip,0,4); // force ip 0.0.0.0
         send_dhcp_message(NULL);
-        enableBroadcast(true); //Temporarily enable broadcasts
+       // enableBroadcast(true); //Temporarily enable broadcasts
         dhcpState = DHCP_STATE_SELECTING;
         stateTimer = millis();
         break;
@@ -411,7 +436,7 @@ void EtherCard::DhcpStateMachine (uint16_t len)
     case DHCP_STATE_REQUESTING:
     case DHCP_STATE_RENEWING:
         if (dhcp_received_message_type(len, DHCP_ACK)) {
-            disableBroadcast(true); //Disable broadcast after temporary enable
+           // disableBroadcast(true); //Disable broadcast after temporary enable
             process_dhcp_ack(len);
             leaseStart = millis();
             if (gwip[0] != 0) setGwIp(gwip); // why is this? because it initiates an arp request

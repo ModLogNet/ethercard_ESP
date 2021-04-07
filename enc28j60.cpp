@@ -22,6 +22,13 @@ uint16_t ENC28J60::bufferSize;
 bool ENC28J60::broadcast_enabled = false;
 bool ENC28J60::promiscuous_enabled = false;
 
+#define MY_CS   33
+#define MY_SCLK     25
+#define MY_MISO     27
+#define MY_MOSI     26
+
+SPIClass MY_SPI(HSPI);
+
 // ENC28J60 Control Registers
 // Control register definitions are a combination of address,
 // bank number, and Ethernet/MAC/PHY indicator bits.
@@ -244,23 +251,24 @@ static byte selectPin;
 
 #ifdef __AVR__
 void ENC28J60::initSPI () {
-    pinMode(SS, OUTPUT);
-    digitalWrite(SS, HIGH);
-    pinMode(MOSI, OUTPUT);
-    pinMode(SCK, OUTPUT);
-    pinMode(MISO, INPUT);
 
-    digitalWrite(MOSI, HIGH);
-    digitalWrite(MOSI, LOW);
-    digitalWrite(SCK, LOW);
+    pinMode(MY_CS, OUTPUT);
+    digitalWrite(MY_CS, HIGH);
+    pinMode(MY_MOSI, OUTPUT);
+    pinMode(MY_SCLK, OUTPUT);
+    pinMode(MY_MISO, INPUT);
+
+    digitalWrite(MY_MOSI, HIGH);
+    digitalWrite(MY_MOSI, LOW);
+    digitalWrite(MY_SCLK, LOW);
 
     SPCR = bit(SPE) | bit(MSTR); // 8 MHz @ 16
     bitSet(SPSR, SPI2X);
 }
 #else
 void ENC28J60::initSPI () {
-	SPI.begin();
-	SPI.setBitOrder(SPI_MSBFIRST);
+	MY_SPI.begin(MY_SCLK,MY_MISO,MY_MOSI,MY_CS);//25,26,27,33
+	MY_SPI.setBitOrder(SPI_MSBFIRST);
 }
 #endif
 
@@ -337,23 +345,23 @@ static void writeBuf(uint16_t len, const byte* data) {
     disableChip();
 }
 
-#else // Else, use SPI.transfer from SPI library.
+#else // Else, use MY_SPI.transfer from SPI library.
 
 static byte readOp (byte op, byte address) {
     enableChip();
 	byte result;
-	SPI.transfer(op | (address & ADDR_MASK));
-	result = SPI.transfer(0x00);
+	MY_SPI.transfer(op | (address & ADDR_MASK));
+	result = MY_SPI.transfer(0x00);
 	if (address & 0x80)
-		result = SPI.transfer(0x00);
+		result = MY_SPI.transfer(0x00);
     disableChip();
     return result;
 }
 
 static void writeOp (byte op, byte address, byte data) {
     enableChip();
-	SPI.transfer(op | (address & ADDR_MASK));
-	SPI.transfer(data);
+	MY_SPI.transfer(op | (address & ADDR_MASK));
+	MY_SPI.transfer(data);
     disableChip();
 }
 
@@ -362,7 +370,7 @@ static void writeOp (byte op, byte address, byte data) {
 //
 //    enableChip();
 //    if (len != 0) {    
-//        SPI.transfer(ENC28J60_READ_BUF_MEM);
+//        MY_SPI.transfer(ENC28J60_READ_BUF_MEM);
 //
 //       while (--len) {
 //            
@@ -374,9 +382,9 @@ static void writeOp (byte op, byte address, byte data) {
 
 static void readBuf(uint16_t len, byte* data) { //this bit ipsis literis from Seradisis's port
     enableChip();
-	SPI.transfer(ENC28J60_READ_BUF_MEM);
+	MY_SPI.transfer(ENC28J60_READ_BUF_MEM);
     while (len--) {
-		*data++ = SPI.transfer(0x00);
+		*data++ = MY_SPI.transfer(0x00);
     }
     disableChip();
 }
@@ -384,10 +392,10 @@ static void readBuf(uint16_t len, byte* data) { //this bit ipsis literis from Se
 //static void writeBuf(uint16_t len, const byte* data) { //this bit trying to re-write from the latest code
 //    enableChip();
 //    if (len != 0) {
-//        SPI.transfer(ENC28J60_WRITE_BUF_MEM);
+//        MY_SPI.transfer(ENC28J60_WRITE_BUF_MEM);
 //           
 //        while (--len) {
-//			SPI.transfer(*data++);
+//			MY_SPI.transfer(*data++);
 //     	}
 //    }
 //    disableChip();
@@ -395,10 +403,10 @@ static void readBuf(uint16_t len, byte* data) { //this bit ipsis literis from Se
 
 static void writeBuf(uint16_t len, const byte* data) { //this bit ipsis literis from Seradisis's port
     enableChip();
-	SPI.transfer(ENC28J60_WRITE_BUF_MEM);
+	MY_SPI.transfer(ENC28J60_WRITE_BUF_MEM);
 
 	while (len--)
-		SPI.transfer(*data++);
+		MY_SPI.transfer(*data++);
 
     disableChip();
 }
@@ -447,10 +455,10 @@ static void writePhy (byte address, uint16_t data) {
         ;
 }
 
-byte ENC28J60::initialize (uint16_t size, const byte* macaddr, byte csPin) {
+byte ENC28J60::initialize (uint16_t size, const byte* macaddr, byte CS) {
     bufferSize = size;
     initSPI();
-    selectPin = csPin;
+    selectPin = MY_CS;
     pinMode(selectPin, OUTPUT);
     disableChip();
     writeOp(ENC28J60_SOFT_RESET, 0, ENC28J60_SOFT_RESET);
@@ -728,7 +736,7 @@ void ENC28J60::disablePromiscuous (bool temporary) {
     }
 }
 
-uint8_t ENC28J60::doBIST ( byte csPin) {
+uint8_t ENC28J60::doBIST ( byte CS) {
 #define RANDOM_FILL     0b0000
 #define ADDRESS_FILL    0b0100
 #define PATTERN_SHIFT   0b1000
@@ -739,7 +747,7 @@ uint8_t ENC28J60::doBIST ( byte csPin) {
     if (bitRead(SPCR, SPE) == 0)
 #endif
         initSPI();
-    selectPin = csPin;
+    selectPin = MY_CS;
     pinMode(selectPin, OUTPUT);
     disableChip();
 

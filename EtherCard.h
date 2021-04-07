@@ -285,7 +285,7 @@ public:
     static bool using_dhcp;   ///< True if using DHCP
     static bool persist_tcp_connection; ///< False to break connections on first packet received
     static uint16_t delaycnt; ///< Counts number of cycles of packetLoop when no packet received - used to trigger periodic gateway ARP request
-
+	static String DHCP_Domain;
     // EtherCard.cpp
     /**   @brief  Initialise the network interface
     *     @param  size Size of data buffer

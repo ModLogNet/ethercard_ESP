@@ -11,18 +11,15 @@ ESP_8266 port by Guilherme Poletto.
 Based on the work by Seradisis for the STM32 platform.
 Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Serasidis_EtherCard_STM
 
+## Library Installation
+
+1. Download the ZIP file from https://github.com/jcw/ethercard/archive/master.zip
+2. From the Arduino IDE: Sketch -> Include Library... -> Add .ZIP Library...
+3. Restart the Arduino IDE to see the new "EtherCard" library with examples
+
+See the comments in the example sketches for details about how to try them out.
 
 ## Physical Installation
-
-### PIN Connections (using ESP32 with Arduino IDE):
-
-    [ENC]	[ESP32]
-    VCC -	3.3V
-    GND -	GND
-    SO -	MISO [19]
-    SI -	MOSI [23]
-    SCK -	CLK [18]
-    CS -	CSO [5]
 
 ### PIN Connections (Using Arduino UNO):
 
@@ -56,9 +53,7 @@ Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Sera
 			//Some ENC28j60 boards have a 10k pullup that MUST be removed
 			//as not to interfere with the ESP bootup process
 
-
-
-## Original Library Support
+## Support
 
 For questions and help, see the [forums][F] (at JeeLabs.net).
 The issue tracker has been moved back to [Github][I] again.
