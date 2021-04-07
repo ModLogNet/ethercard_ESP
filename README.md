@@ -14,7 +14,7 @@ Available at: https://github.com/Serasidis/STM32duino/tree/master/libraries/Sera
 
 <<<<<<< HEAD
 ## Physical Installation
-=======
+
 Custom pins are defined in ethercard.cpp
 
 #define MY_CS       33
@@ -24,10 +24,6 @@ Custom pins are defined in ethercard.cpp
 #define MY_MISO     27
 
 #define MY_MOSI     26
-
-
-Credit @ColinDexter
-
 
 ## Support and credit for original library forked
 
